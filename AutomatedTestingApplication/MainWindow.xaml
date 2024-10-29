@@ -1,0 +1,389 @@
+﻿<Window x:Class="AutomatedTestingApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutomatedTestingApplication" 
+        xmlns:converters="clr-namespace:AutomatedTestingApplication.Converters"
+        mc:Ignorable="d"
+        Title="Автоматизация тестирования знаний" Height="450" Width="800"
+        ResizeMode="NoResize">
+
+    <Window.Resources>
+        <converters:SubjectConverter x:Key="SubjectConverter" />
+        <converters:TestConverter x:Key="TestConverter" />
+        <converters:GroupConverter x:Key="GroupConverter" />
+        <converters:RoleConverter x:Key="RoleConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid x:Name="AuthorizationGrid">
+            <Grid Height="440" Width="795" >
+                <StackPanel Style="{StaticResource StackPanel}">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Margin="0,0,7.5,0">Логин:</Label>
+                        <TextBox x:Name="LoginTextBox" Style="{StaticResource TextBox}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Пароль:</Label>
+                        <PasswordBox x:Name="PasswordPassBox" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" PasswordChar="*" Width="200" Margin="3"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <Button x:Name="LogInButton" Content="Войти" Style="{StaticResource Button}" Click="LogInButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="StudentGrid">
+            <TabControl Name="StudentTabControl" Style="{StaticResource TabControl}" Background="#FFD8DBFF">
+                <TabItem Header="Тесты" Style="{StaticResource TabItem}" MouseUp="Test_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="StudentTestDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,40">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Название теста" Binding="{Binding TestId, Converter={StaticResource TestConverter}, Mode=TwoWay}" />
+                                <DataGridTextColumn Header="Предмет" Binding="{Binding SubjectName}" />
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button x:Name="StartTestButton" Click="StartTestButton_Click">Пройти тест</Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button x:Name="CheckTestResultButton" Click="CheckTestResultButton_Click">Результат</Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <Button x:Name="LogOutStudentButton" Style="{StaticResource ExitButton}"  Click="LogOutStudentButton_Click">Выход</Button>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="TeacherGrid">
+            <TabControl Name="TeacherTabControl" Style="{StaticResource TabControl}" Background="#FFD8DBFF">
+                <TabItem Header="Тесты групп" Style="{StaticResource TabItem}" MouseUp="TeacherTestGroup_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="TeacherTestListDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Название теста" Binding="{Binding TestId, Converter={StaticResource TestConverter}, Mode=TwoWay}" />
+                                <DataGridTextColumn Header="Группа" Binding="{Binding GroupId, Converter={StaticResource GroupConverter}, Mode=TwoWay}" />
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button x:Name="TestGroupResultButton" Click="TestGroupResultButton_Click">Результаты</Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="TeacherAddTestGroupButton" Content="Добавить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="TeacherAddTestGroupButton_Click"/>
+                            <Button x:Name="TeacherDeleteTestGroupButton" Content="Удалить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="TeacherDeleteTestGroupButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Редактор тестов" Style="{StaticResource TabItem}" MouseUp="TestEditor_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="TestEditorDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Название теста" Binding="{Binding Name}" />
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Click="TestEditorOpenButton_Click">Вопросы</Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="TeacherAddTestButton" Content="Добавить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="TestEditorAddButton_Click"/>
+                            <Button x:Name="TeacherDeleteTestButton" Content="Удалить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="TestEditorDeleteButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <Button x:Name="LogOutTeacherButton" Style="{StaticResource ExitButton}"  Click="LogOutTeacherButton_Click">Выход</Button>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="AdminGrid">
+            <TabControl Name="AdminTabControl" Style="{StaticResource TabControl}" Background="#FFD8DBFF">
+                <TabItem Header="Пользователи" Style="{StaticResource TabItem}" MouseUp="UserTabItem_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="UserDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" />
+                                <DataGridTextColumn Header="Имя" Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="Отчество" Binding="{Binding Patronymic}" />
+                                <DataGridTextColumn Header="Логин" Binding="{Binding Login}" />
+                                <DataGridTextColumn Header="Пароль" Binding="{Binding Password}" />
+                                <DataGridTextColumn Header="Роль" Binding="{Binding RoleId, Converter={StaticResource RoleConverter}, Mode=TwoWay}" />
+                                <DataGridTextColumn Header="Группа" Binding="{Binding GroupId, Converter={StaticResource GroupConverter}, Mode=TwoWay}" />
+                                <DataGridTextColumn Header="Предмет" Binding="{Binding SubjectId, Converter={StaticResource SubjectConverter}, Mode=TwoWay}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="UserAddButton" Content="Добавить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="UserAddButton_Click"/>
+                            <Button x:Name="UserDeleteButton" Content="Удалить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="UserDeleteButton_Click"/>
+                            <Button x:Name="UserChangeButton" Content="Изменить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="UserChangeButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Группы" Style="{StaticResource TabItem}" MouseUp="GroupTabItem_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="GroupDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Группа" Binding="{Binding Name}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="GroupAddButton" Content="Добавить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="GroupAddButton_Click"/>
+                            <Button x:Name="GroupDeleteButton" Content="Удалить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="GroupDeleteButton_Click" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Предметы" Style="{StaticResource TabItem}" MouseUp="SubjectTabItem_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="SubjectDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Предмет" Binding="{Binding Name}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="SubjectAddButton" Content="Добавить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="SubjectAddButton_Click"/>
+                            <Button x:Name="SubjectDeleteButton" Content="Удалить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="SubjectDeleteButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Тесты" Style="{StaticResource TabItem}" MouseUp="AdminTestTabItem_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="TestListDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Название теста" Binding="{Binding Id, Converter={StaticResource TestConverter}, Mode=TwoWay}" />
+                                <DataGridTextColumn Header="Фамилия" Binding="{Binding TeacherSurname}" />
+                                <DataGridTextColumn Header="Предмет" Binding="{Binding SubjectName}" />
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button x:Name="AdminQuestionButton" Click="AdminQuestionButton_Click">Вопросы</Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="TestDeleteAdminButton" Content="Удалить" Margin="0,0,5,0" Click="TestDeleteAdminButton_Click" Style="{StaticResource Button}" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="LogTabItem" Style="{StaticResource TabItem}" MouseUp="LogTabItem_MouseUp">
+                    <Grid Height="435">
+                        <DataGrid Name="LogDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,40,15,65">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="User Id" Binding="{Binding UserId}" />
+                                <DataGridTextColumn Header="Время" Binding="{Binding Time}" />
+                                <DataGridTextColumn Header="Лог" Binding="{Binding LogName}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,35">
+                            <Button x:Name="BackupDbButton" Style="{StaticResource ExitButton}" Margin="0,0,5,0" Click="BackupDbButton_Click">Backup Db</Button>
+                            <Button x:Name="BackupLogDbButton" Style="{StaticResource ExitButton}" Margin="0,0,5,0" Click="BackupLogDbButton_Click">Журнал Db</Button>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Запросы" Style="{StaticResource TabItem}">
+                    <Grid Height="435">
+                        <Label Margin="11,45,15,15">Sql запрос</Label>
+                        <TextBox x:Name="SqlRequestTextBox" VerticalAlignment="Top" Height="50" KeyDown="SqlRequestTextBox_KeyDown" Margin="15,70,15,15"/>
+                        <Label Margin="11,120,15,15">Результат</Label>
+                        <DataGrid Name="SqlRequestDataGrid" IsReadOnly="true" AutoGenerateColumns="True" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,145,15,65">
+                            <DataGrid.Columns>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <Button x:Name="LogOutAdminButton" Style="{StaticResource ExitButton}" Click="LogOutAdminButton_Click">Выход</Button>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="UserGrid">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Label>Фамилия:</Label>
+                    <TextBox x:Name="SurnameTextBox" Style="{StaticResource TextBox}" Margin="5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Имя:</Label>
+                    <TextBox x:Name="NameTextBox" Style="{StaticResource TextBox}" Margin="31,5,5,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Отчество:</Label>
+                    <TextBox x:Name="PatronymicTextBox" Style="{StaticResource TextBox}" Margin="4,5,5,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Логин:</Label>
+                    <TextBox x:Name="LogInTextBox" Style="{StaticResource TextBox}" Margin="21,5,5,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Пароль:</Label>
+                    <TextBox x:Name="PasswordTextBox" Style="{StaticResource TextBox}" Margin="14,5,5,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Роль:</Label>
+                    <ComboBox x:Name="RoleComboBox"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" DisplayMemberPath="Name" SelectionChanged="RoleComboBox_SelectionChanged" Width="200" Height="18" Margin="29,3,3,3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" >
+                    <Label>Группа</Label>
+                    <ComboBox x:Name="GroupComboBox" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" DisplayMemberPath="Name" Width="200" Height="18" Margin="19,3,3,3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Предмет</Label>
+                    <ComboBox x:Name="SubjectComboBox" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"  DisplayMemberPath="Name" Width="200" Height="18" Margin="9.5,3,3,3"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="SaveUserButton" Content="Сохранить"  Style="{StaticResource Button}" Margin="3" Click="UserSaveButton_Click"/>
+                    <Button x:Name="BackUserButton" Content="Назад"  Style="{StaticResource Button}" Margin="3" Click="UserBackButton_Click"/>
+                </StackPanel>
+
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="GroupGrid">
+            <StackPanel Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Label>Группа:</Label>
+                    <TextBox x:Name="GroupTextBox" Style="{StaticResource TextBox}" Width="195" Margin="5"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="SaveGroupButton" Content="Сохранить"  Style="{StaticResource Button}" Margin="3" Click="GroupSaveButton_Click"/>
+                    <Button x:Name="BackGroupButton" Content="Назад"  Style="{StaticResource Button}" Margin="3" Click="GroupBackButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="SubjectGrid">
+            <StackPanel Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Label>Предмет:</Label>
+                    <TextBox x:Name="SubjectTextBox" Style="{StaticResource TextBox}" Width="195" Margin="5"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="SaveSubjectButton" Content="Сохранить"  Style="{StaticResource Button}" Margin="3" Click="SubjectSaveButton_Click"/>
+                    <Button x:Name="BackSubjectButton" Content="Назад"  Style="{StaticResource Button}" Margin="3" Click="SubjectBackButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="TestGrid">
+
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="RequestGrid">
+
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="TestEditorGrid">
+            <StackPanel Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Label>Тест:</Label>
+                    <TextBox x:Name="TestNameTextBox" Style="{StaticResource TextBox}" Width="195" Margin="5"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="SaveTestEditorButton" Content="Сохранить"  Style="{StaticResource Button}" Margin="3" Click="TestEditorSaveButton_Click"/>
+                    <Button x:Name="BackTestEditorButton" Content="Назад"  Style="{StaticResource Button}" Margin="3" Click="TestEditorBackButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="QuestionGrid">
+            <Grid Width="200" HorizontalAlignment="Left">
+                <ListBox x:Name="questionListBox" Margin="15,15,15,50" MouseUp="questionListBox_MouseUp">
+                </ListBox>
+                <StackPanel Margin="22" VerticalAlignment="Bottom" Orientation="Horizontal">
+                    <Button x:Name="AddQuestionButton" Content="Добавить"  Style="{StaticResource Button}" Margin="3" Click="QuestionAddButton_Click"/>
+                    <Button x:Name="DeleteQuestionButton" Content="Удалить"  Style="{StaticResource Button}" Margin="3" Click="QuestionDeleteButton_Click"/>
+                </StackPanel>
+            </Grid>
+            <Grid Width="600" Margin="200,0,0,0">
+                <Label Content="Вопрос:" HorizontalAlignment="Left" Margin="25,5,0,0" VerticalAlignment="Top"/>
+                <Label Content="Ответ:" HorizontalAlignment="Left" Margin="25,80,0,0" VerticalAlignment="Top"/>
+                <Label Content="Дополнительные варианты ответов:" HorizontalAlignment="Left" Margin="25,155,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="QuestionTextBox" HorizontalAlignment="Center" Margin="0,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="540" Height="50"/>
+                <TextBox x:Name="AnswerTextBox" HorizontalAlignment="Center" Margin="0,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="540" Height="50"/>
+                <TextBox x:Name="WrongAnswerTextBox" HorizontalAlignment="Center" Margin="0,185,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="540" Height="176" KeyDown="WrongAnswerTextBox_KeyDown"/>
+                <StackPanel Margin="22" VerticalAlignment="Bottom" Orientation="Horizontal">
+                <Button x:Name="UpdateQuestionButton" Content="Сохранить"  Style="{StaticResource Button}" Margin="8,3,3,3" Click="QuestionSaveButton_Click"/>
+                <Button x:Name="BackQuestionButton" Content="Назад"  Style="{StaticResource Button}" Margin="395,3,3,3" Click="QuestionBackButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="JunctionGroupTestGrid">
+            <StackPanel Margin="25" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Label>Тест:</Label>
+                    <ComboBox x:Name="TestComboBox" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" DisplayMemberPath="Name" Width="200" Height="18" Margin="19,3,3,3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Группа:</Label>
+                    <ComboBox x:Name="GroupTestComboBox" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" DisplayMemberPath="Name" Width="200" Height="18" Margin="4,3,3,3"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="JunctionTestGroupSaveButton" Content="Сохранить"  Style="{StaticResource Button}" Margin="3" Click="JunctionTestGroupSaveButton_Click"/>
+                    <Button x:Name="JunctionTestGroupBackButton" Content="Назад"  Style="{StaticResource Button}" Margin="3" Click="JunctionTestGroupBackButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="StartTestGrid">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
+                <Label x:Name="NameTestLabel"></Label>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="StartTestStudentButton" Content="Начать" Margin="3" Click="StartTestStudentButton_Click" Style="{StaticResource Button}"/>
+                    <Button x:Name="BackTestButton" Content="Назад" Margin="3" Click="BackTestButton_Click" Style="{StaticResource Button}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="TestQuestionGrid">
+            <StackPanel Margin="25" Width="260" Height="250" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Vertical">
+                    <Label x:Name="QuestionNameLabel"></Label>
+                    <ListBox x:Name="QuestionTestListBox" Margin="5" Height="180">
+                    </ListBox>
+                    <StackPanel HorizontalAlignment="Center"  VerticalAlignment="Center" Orientation="Horizontal">
+                        <Button x:Name="AcceptQuestionButton" Content="Выбрать"  Style="{StaticResource Button}" Margin="3" Click="AcceptQuestionButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="StudentResultGrid">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Результаты</Label>
+                <Label x:Name="StudentNameLabel"></Label>
+                <Label x:Name="StudentTestNameLabel"></Label>
+                <Label x:Name="AmountOfQuestionLabel"></Label>
+                <Label x:Name="AmountOfRightAnwsersLabel"></Label>
+                <Label x:Name="TimeLabel"></Label>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button x:Name="BackStudentButton" Content="Назад" Margin="3" Click="BackStudentButton_Click" Style="{StaticResource Button}"/>
+                    <Button x:Name="PrintResultStudentButton" Content="Печать" Margin="3" Click="PrintResultStudentButton_Click" Style="{StaticResource Button}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Visibility="Hidden" x:Name="GroupResultGrid">
+            <DataGrid Name="TestResultGroupListDataGrid" IsReadOnly="true" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Margin="15,15,15,41">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}"/>
+                    <DataGridTextColumn Header="Кол-во вопросов" Binding="{Binding AmountOfQuestions}" />
+                    <DataGridTextColumn Header="Кол-во ответов"  Binding="{Binding AmountOfAnswers}"/>
+                    <DataGridTextColumn Header="Затраченное время"  Binding="{Binding Time}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,11">
+                <Button x:Name="TestResultDeleteGroupButton" Content="Удалить" Margin="0,0,5,0" Style="{StaticResource Button}" Click="TestResultDeleteGroupButton_Click"/>
+                <Button x:Name="TestResultBackButton" Content="Назад" Margin="0,0,5,0" Style="{StaticResource Button}" Click="TestResultBackButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
